@@ -8,6 +8,8 @@ django-admin = "*"
 django = "*"
 python-decouple = "*"
 djhtml = "*"
+django-crispy-forms = "*"
+pillow = "*"
 
 [dev-packages]
 autopep8 = "*"
