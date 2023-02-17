@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
 
 def register(request): 
     if request.method == 'POST': 
@@ -19,4 +19,28 @@ def register(request):
 """To restrict access unless logged in, include the 'login_required' decorator provided by django's auth module. """
 @login_required
 def profile(request): 
-    return render(request, template_name='users/profile.html', context={})
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user) # user update form
+        # perform update of user profile image, the additional argument 'request.FILES' is included 
+        # to handle the image file being uploaded
+        p_form = ProfileUpdateForm(request.POST, request.FILES, 
+                                   instance=request.user.profile) 
+        # confirm that both the user info form is valid and the profile form is valid
+        if u_form.is_valid() and p_form.is_valid(): 
+            u_form.save()
+            p_form.save()
+            # provide a success response to the user
+            messages.success(request, f'Account successfully updated!!')
+            # perform a redirect to avoid the POST GET Redirect Pattern issue
+            return redirect('profile')
+    else:
+        u_form = UserUpdateForm(instance=request.user) # user update form
+        p_form = ProfileUpdateForm(instance=request.user.profile) # profile image update form 
+        
+    context = {
+        'u_form': u_form, 
+        'p_form': p_form
+    }
+    return render(request, template_name='users/profile.html', context=context)
+
+
