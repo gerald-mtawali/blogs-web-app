@@ -1,9 +1,7 @@
 {% extends 'blogs/base.html' %}
 {% block content %}
-    {% comment %}
-    <h1>Blogs Home</h1>
-    <p>This is the home of blogs. THere is nothing quite like it</p>
-    {% endcomment %} 
+    <h1 class="mb-3"> Posts by {{ view.kwargs.username}} </h1>
+    <h2 class="mb-3">{{page_obj.paginator.count}} Posts</h2>
     {% for post in posts %}
     <article class="media content-section">
       <img class="rounded-circle article-img"src="{{post.author.profile.image.url}}" alt="{{post.author.profile.username}}">

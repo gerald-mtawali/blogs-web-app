@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 # from django.http import HttpResponse
 from .models import Post
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
+from django.views.generic import (ListView, DetailView, CreateView, UpdateView, DeleteView)
+from django.contrib.auth.mixins import (LoginRequiredMixin, UserPassesTestMixin)
+from django.contrib.auth.models import User 
 
 def home(request):
     # query the post data over here
@@ -37,7 +37,28 @@ class PostListView(ListView):
     # set the context to match the object we're looking for in the template
     context_object_name = 'posts'
     ordering = ['-date_posted']
+    paginate_by=5       # define the number of objects to display per page
+    
 
+class UserPostListView(ListView):
+    """Home page for the Blogs app. 
+        Inherits functionality from a ListView. 
+        We have configured the parameters of this class to match our existing definitions
+    Args:
+        ListView (_type_): _description_
+    """
+    model = Post
+    # naming convention is <app-name>/<model>_<viewtype>.html
+    template_name = 'blogs/user_posts.html'
+    # set the context to match the object we're looking for in the template
+    context_object_name = 'posts'
+    ordering = ['-date_posted']
+    paginate_by=5       # define the number of objects to display per page
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return Post.objects.filter(author=user).order_by('-date_posted')
+        # return super().get_queryset()
 
 class PostDetailView(DetailView):
     """Home page for the Blogs app. 
